@@ -16,7 +16,6 @@ C:\Users\Hp\Documents\SkeletonBasics-WPF\obj\x86\Debug\Microsoft.Samples.Kinect.
 C:\Users\Hp\Documents\SkeletonBasics-WPF\obj\x86\Debug\SkeletonBasics-WPF.csproj.GenerateResource.Cache
 C:\Users\Hp\Documents\SkeletonBasics-WPF\obj\x86\Debug\SkeletonBasics-WPF.exe
 C:\Users\Hp\Documents\SkeletonBasics-WPF\obj\x86\Debug\SkeletonBasics-WPF.pdb
-C:\Users\Hp\Documents\SkeletonBasics-WPF\bin\x86\Debug\WPFVisifire.Charts.dll
 C:\Users\Hp\Documents\SkeletonBasics-WPF\bin\x86\Debug\SkeletonBasics-WPF.exe.manifest
 C:\Users\Hp\Documents\SkeletonBasics-WPF\bin\x86\Debug\SkeletonBasics-WPF.application
 C:\Users\Hp\Documents\SkeletonBasics-WPF\obj\x86\Debug\SkeletonBasics-WPF.exe.manifest

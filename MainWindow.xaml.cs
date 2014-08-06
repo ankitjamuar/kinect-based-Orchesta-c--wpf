@@ -24,6 +24,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     {
 
         double lastCordi = 0;
+        bool wmpAdded = false;
         /// <summary>
         /// Width of output drawing
         /// </summary>
@@ -103,7 +104,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             InitializeComponent();
             //this.CreateChart();
-            Console.WriteLine(HttpPost("http://192.168.2.15/candid/backend.php", "_ACTION=_DETAILS&_TAGID=0003396358"));
+           // Console.WriteLine(HttpPost("http://192.168.2.15/candid/backend.php", "_ACTION=_DETAILS&_TAGID=0003396358"));
         }
 
        
@@ -112,14 +113,20 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
 
             wmp = new AxWindowsMediaPlayer();
-            windowsFormsHost1.Child = wmp;
+           
             
-            wmp.URL = @"F:\videos\SEASONS\How I Met Your Mother\rayban.mp4";
+            
+            
+            // If the player is playing, switch to full screen. 
+            //if (wmp.playState == WMPLib.WMPPlayState.wmppsPlaying)
+           // {
+             //   wmp.fullScreen = true;
+           // }
+            
+            
           
             vals = new List<double>();
-             
-             
-            
+           
             // Create the drawing group we'll use for drawing
             this.drawingGroup = new DrawingGroup();
 
@@ -222,22 +229,37 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                             vals.Add(disp);
 
+
                             if (vals.Count > 14)
                             {
-                                
+
+                                i = 0;
                                 foreach (double v in vals) // Loop through List with foreach
                                 {
                                     temp += v;
                                 }
-                                
-                                
+
+
+                                if (!wmpAdded)
+                                {
+                                     windowsFormsHost1.Child = wmp;
+                                     //wmp.Ctlcontrols.stop();
+                                     wmp.URL = @"F:\videos\SEASONS\How I Met Your Mother\rayban.mp4";
+                                     wmpAdded = true;
+                                     bg.Visibility = Visibility.Hidden;
+                                     wmp.uiMode = "none";
+                                     // If the player is playing, switch to full screen. 
+                                     if (wmp.playState == WMPLib.WMPPlayState.wmppsPlaying)
+                                     {
+                                         wmp.fullScreen = true;
+                                     }
+                                }
                                 Console.Write(Math.Round(temp, 3));
 
                                 if (Math.Round(temp, 3) > 0.8 && Math.Round(temp, 3) < 1.5)
                                 {
 
                                     Console.WriteLine("FAST");
-                                    //vlc.playFaster();
                                     wmp.settings.rate = 2;
                                 }
                                 else if (Math.Round(temp, 3) < 0.7)
@@ -254,13 +276,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                     //vlc.playSlower();
                                     wmp.settings.rate = 3.0;
                                 }
-                                textBox1.Text = Math.Round(temp, 3).ToString();
+                               
 
-
+                               
                                 temp = 0;
                                 vals.Clear();
                             }
+                            
 
+                            /*if (i > 500) {
+                                wmp.Ctlcontrols.stop();
+                                bg.Visibility = Visibility.Hidden;
+                               
+                                Console.WriteLine("     STOPPING");
+                            }
+                            */
                            
                           
                            
