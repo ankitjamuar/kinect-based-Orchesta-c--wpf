@@ -13,6 +13,7 @@ using AxWMPLib;
 using System.Collections.Generic;
 using Visifire.Charts;
 using Visifire.Commons;
+using System.Threading;
 
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
@@ -24,6 +25,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     {
 
         double lastCordi = 0;
+        int trackingId;
+        bool trackingIdSet = false;
         bool wmpAdded = false;
         /// <summary>
         /// Width of output drawing
@@ -104,9 +107,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             InitializeComponent();
             //this.CreateChart();
+            //Thread thread = new Thread(new ThreadStart(httpRequest));
            // Console.WriteLine(HttpPost("http://192.168.2.15/candid/backend.php", "_ACTION=_DETAILS&_TAGID=0003396358"));
         }
 
+        private void httpRequest() 
+        {
+ 
+        }
        
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -213,92 +221,127 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     {
                        // RenderClippedEdges(skel, dc);
 
-
-
-
                         if (skel.TrackingState == SkeletonTrackingState.Tracked)
                         {
-                            this.DrawBonesAndJoints(skel, dc);
 
-                            Joint rightHand = skel.Joints[JointType.HandRight];
-                            double rightX = System.Math.Round(rightHand.Position.X, 4);
-                            rightX += 1;
-                            
-
-                            double disp = Math.Abs(rightX - lastCordi);
-
-                            vals.Add(disp);
+                            if (!trackingIdSet)
+                            {
+                                this.trackingId = skel.TrackingId;
+                                trackingIdSet = true;
+                            }
 
 
-                            if (vals.Count > 14)
+                            if (skel.TrackingId == trackingId)
                             {
 
-                                i = 0;
-                                foreach (double v in vals) // Loop through List with foreach
+                                this.DrawBonesAndJoints(skel, dc);
+
+                                Joint rightHand = skel.Joints[JointType.HandRight];
+                                double rightX = System.Math.Round(rightHand.Position.X, 4);
+                                double rightY = Math.Round(rightHand.Position.Y, 1);
+                                rightX += 1;
+                                rightY += 1.2;
+                                //Console.WriteLine(Math.Round(rightX,1));
+                                double xSquare = Math.Round(rightHand.Position.X, 2);
+                                double ySquare = Math.Round(rightHand.Position.Y, 2);
+                                Console.Write(xSquare * xSquare);
+                                Console.Write("+");
+                                Console.Write(ySquare * ySquare);
+                                Console.WriteLine((xSquare * xSquare) + (ySquare * ySquare));
+;                                if (rightY > 1 && rightY < 1.3 && wmpAdded) {
+
+                                    wmp.settings.volume = 35;
+
+                                }
+                                else if (rightY > 1.3 && rightY < 1.5 && wmpAdded)
                                 {
-                                    temp += v;
+
+                                    wmp.settings.volume = 65;
+
+                                }
+                                else if (rightY > 1.5 && rightY < 1.8 && wmpAdded)
+                                {
+
+                                    wmp.settings.volume = 100;
+
+                                }
+                                    
+
+                                double disp = Math.Abs(rightX - lastCordi);
+
+                                vals.Add(disp);
+
+
+                                if (vals.Count > 14)
+                                {
+
+                                    i = 0;
+                                    foreach (double v in vals) // Loop through List with foreach
+                                    {
+                                        temp += v;
+                                    }
+
+
+                                    if (!wmpAdded)
+                                    {
+                                        windowsFormsHost1.Child = wmp;
+                                        //wmp.Ctlcontrols.stop();
+                                        wmp.URL = @"F:\videos\SEASONS\How I Met Your Mother\rayban.mp4";
+                                        wmpAdded = true;
+                                        bg.Visibility = Visibility.Hidden;
+                                        wmp.uiMode = "none";
+                                        
+                                        // If the player is playing, switch to full screen. 
+                                        if (wmp.playState == WMPLib.WMPPlayState.wmppsPlaying)
+                                        {
+                                            wmp.fullScreen = true;
+                                        }
+                                    }
+                                    Console.Write(Math.Round(temp, 3));
+
+                                    if (Math.Round(temp, 3) > 0.8 && Math.Round(temp, 3) < 1.5)
+                                    {
+
+                                        Console.WriteLine("FAST");
+                                        wmp.settings.rate = 2;
+                                    }
+                                    else if (Math.Round(temp, 3) < 0.7)
+                                    {
+
+                                        Console.WriteLine("SLOWER");
+                                        //vlc.playSlower();
+                                        wmp.settings.rate = 0.5;
+                                    }
+                                    else if (Math.Round(temp, 3) > 1.6)
+                                    {
+
+                                        Console.WriteLine("SUPER FAST");
+                                        //vlc.playSlower();
+                                        wmp.settings.rate = 3.0;
+                                    }
+
+
+
+                                    temp = 0;
+                                    vals.Clear();
                                 }
 
 
-                                if (!wmpAdded)
-                                {
-                                     windowsFormsHost1.Child = wmp;
-                                     //wmp.Ctlcontrols.stop();
-                                     wmp.URL = @"F:\videos\SEASONS\How I Met Your Mother\rayban.mp4";
-                                     wmpAdded = true;
-                                     bg.Visibility = Visibility.Hidden;
-                                     wmp.uiMode = "none";
-                                     // If the player is playing, switch to full screen. 
-                                     if (wmp.playState == WMPLib.WMPPlayState.wmppsPlaying)
-                                     {
-                                         wmp.fullScreen = true;
-                                     }
-                                }
-                                Console.Write(Math.Round(temp, 3));
-
-                                if (Math.Round(temp, 3) > 0.8 && Math.Round(temp, 3) < 1.5)
-                                {
-
-                                    Console.WriteLine("FAST");
-                                    wmp.settings.rate = 2;
-                                }
-                                else if (Math.Round(temp, 3) < 0.7)
-                                {
-
-                                    Console.WriteLine("SLOWER");
-                                    //vlc.playSlower();
-                                    wmp.settings.rate = 0.5;
-                                }
-                                else if (Math.Round(temp, 3) > 1.6)
-                                {
-
-                                    Console.WriteLine("SUPER FAST");
-                                    //vlc.playSlower();
-                                    wmp.settings.rate = 3.0;
-                                }
+                                /*if (i > 500) {
+                                    wmp.Ctlcontrols.stop();
+                                    bg.Visibility = Visibility.Hidden;
                                
+                                    Console.WriteLine("     STOPPING");
+                                }
+                                */
 
-                               
-                                temp = 0;
-                                vals.Clear();
+
+
+                                lastCordi = rightX;
+
+
                             }
-                            
-
-                            /*if (i > 500) {
-                                wmp.Ctlcontrols.stop();
-                                bg.Visibility = Visibility.Hidden;
-                               
-                                Console.WriteLine("     STOPPING");
-                            }
-                            */
-                           
-                          
-                           
-                            lastCordi = rightX;
-             
-
                         }
-                       
                     }
                 }
 
